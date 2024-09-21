@@ -1,6 +1,6 @@
 {
   "name": "preconfig-dev",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Genera una configuración predeterminada para .vscode/settings.json",
   "main": "index.js",
   "bin": {
@@ -14,7 +14,14 @@
     "eslint",
     "prettier"
   ],
-  "author": "Traina Felipe",
+  "author": {
+    "name": "Felipe Traina",
+    "url": "https://www.felidev.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Feli87/preconfig-dev.git"
+  },
   "license": "MIT",
   "dependencies": {
     "commander": "^12.1.0"
