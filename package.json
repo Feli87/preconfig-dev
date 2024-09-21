@@ -1,6 +1,7 @@
 {
   "name": "preconfig-dev",
-  "version": "1.1.5",
+  "version": "2.0.0",
+  "type":"module",
   "description": "Genera una configuración predeterminada para .vscode/settings.json",
   "main": "index.js",
   "bin": {

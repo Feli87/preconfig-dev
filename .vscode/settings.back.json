@@ -1,4 +1,13 @@
 {
+    "prettier.semi": true,
+    "prettier.trailingComma": "all",
+    "prettier.singleQuote": true,
+    "prettier.printWidth": 80,
+    "prettier.tabWidth": 2,
+    "prettier.jsxSingleQuote": true,
+    "prettier.bracketSpacing": true,
+    "prettier.arrowParens": "avoid",
+    "prettier.endOfLine": "lf",
     "tailwindCSS.includeLanguages": {
         "plaintext": "html",
         "javascript": "javascript",

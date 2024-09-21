@@ -1,32 +1,28 @@
 #!/usr/bin/env node
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { program } from 'commander';
+import { loadConfig, mergeConfigs, writeConfig } from './utils/utils.js';
 
-const fs = require('fs');
-const path = require('path');
-const { program } = require('commander');
+// Obtener la ruta del directorio actual
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const preconfigsDir = path.join(__dirname, 'preconfigs');
 
-// Función para leer y parsear un archivo JSON
-const loadConfig = (filePath) => {
-    try {
-        const data = fs.readFileSync(filePath, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        console.error(`Error al cargar la configuración: ${filePath}`, error);
-        process.exit(1);
+// Cargar opciones dinámicamente
+const preconfigDirs = fs.readdirSync(preconfigsDir).filter(dir => fs.lstatSync(path.join(preconfigsDir, dir)).isDirectory());
+
+for (const dir of preconfigDirs) {
+    const optionFile = path.join(preconfigsDir, dir, `${dir}.option.js`);
+    if (fs.existsSync(optionFile)) {
+        const optionLogic = await import(optionFile);
+        optionLogic.default(program);
     }
-};
+}
 
-// Función para mezclar dos configuraciones
-const mergeConfigs = (baseConfig, newConfig) => {
-    return { ...baseConfig, ...newConfig };
-};
-
-// Definir las opciones del CLI usando commander
-program
-    .option('-t, --tailwind', 'Agregar configuración de Tailwind CSS')
-    .option('-c, --copilot', 'Agregar configuración de GitHub Copilot')
-    .option('-p, --prettier', 'Agregar configuración de  Prettier')
-    .parse(process.argv);
-
+// Procesar las opciones del CLI
+program.parse(process.argv);
 const options = program.opts();
 
 /**
@@ -44,7 +40,11 @@ let finalConfig = {};
  * Verificar si ya existe un archivo settings.json
  */
 if (fs.existsSync(settingsPath)) {
-    finalConfig = loadConfig(settingsPath);
+    let date = new Date().toISOString().replace(/:/g, '-');
+    const backupPath = path.join(vscodeDir, `settings.back.${date}.json`);
+    fs.renameSync(settingsPath, backupPath);
+    console.log('Archivo settings.json renombrado a settings.back.json.');
+    finalConfig = {};
 } else {
     if (!fs.existsSync(vscodeDir)) {
         fs.mkdirSync(vscodeDir);
@@ -53,34 +53,30 @@ if (fs.existsSync(settingsPath)) {
 }
 
 /**
- * Cargar y mezclar configuraciones predefinidas
+ * Cargar y aplicar configuraciones
  */
+const commandMap = {};
 
-// Configuración de Tailwind CSS
-if (options.tailwind) {
-    const tailwindConfig = loadConfig(path.join(__dirname, 'preconfigs', 'tailwind.json'));
-    finalConfig = mergeConfigs(finalConfig, tailwindConfig);
-    console.log('Configuración de Tailwind agregada.');
+for (const dir of preconfigDirs) {
+    const configPath = path.join(preconfigsDir, dir, `${dir}.json`);
+    const commandFile = path.join(preconfigsDir, dir, `${dir}.js`);
+    
+    if (fs.existsSync(configPath) && fs.existsSync(commandFile)) {
+        commandMap[dir] = { configPath, commandFile };
+    }
 }
 
-// Configuración de GitHub Copilot
-if (options.copilot) {
-    const copilotConfig = loadConfig(path.join(__dirname, 'preconfigs', 'copilot.json'));
-    finalConfig = mergeConfigs(finalConfig, copilotConfig);
-    console.log('Configuración de Copilot agregada.');
+for (const [key, { configPath, commandFile }] of Object.entries(commandMap)) {
+    if (options[key]) {
+        const commandLogic = await import(commandFile);
+        commandLogic.default(); // Llama a la función por defecto
+        const configJson = loadConfig(configPath);
+        finalConfig = mergeConfigs(finalConfig, configJson);
+        console.log(`Configuración de ${key} agregada.`);
+    }
 }
-
-if (options.prettier) {
-    const prettierConfig = loadConfig(path.join(__dirname, 'preconfigs', 'prettier.json'));
-    finalConfig = mergeConfigs(finalConfig, prettierConfig);
-    console.log('Configuración de ESLint y Prettier agregada.');
-}
-
 
 /**
  * Escribir el archivo settings.json
  */
-fs.writeFileSync(settingsPath, JSON.stringify(finalConfig, null, 2), 'utf-8');
-
-// Mensaje de éxito
-console.log('.vscode/settings.json actualizado exitosamente.');
+writeConfig(settingsPath, finalConfig);
