@@ -94,7 +94,7 @@ Enables inline suggestions and GitHub Copilot in VSCode.
 
 ## Customization
 
-The configurations are stored in the `preconfigs/` folder as JSON files. You can modify or extend these files to add more configurations. 
+The configurations are stored in the `preconfigs/` folder as JSON files. You can modify or extend these files to add more configurations.
 
 For example, to add a new configuration for Prettier, create a `preconfigs/prettier.json` file and then update the CLI to support a `--prettier` flag.
 
@@ -116,7 +116,7 @@ Aquí tienes un bloque de autor que puedes agregar al final de tu `README.md`:
 
 ## Author
 
-**Felipe Traina**
+### Felipe Traina
 
 - GitHub: [@Feli87](https://github.com/Feli87)
 - Twitter: [@TrainaFelipe](https://twitter.com/TrainaFelipe)
