@@ -121,5 +121,6 @@ Aquí tienes un bloque de autor que puedes agregar al final de tu `README.md`:
 - GitHub: [@Feli87](https://github.com/Feli87)
 - Twitter: [@TrainaFelipe](https://twitter.com/TrainaFelipe)
 - LinkedIn: [Traina Felipe](https://www.linkedin.com/in/felipe-traina-ar/)
+- Web [felidev.com](https://www.felidev.com)
 
 If you find this tool helpful or have suggestions for improvements, feel free to reach out or contribute to the project. Your feedback is always welcome!
